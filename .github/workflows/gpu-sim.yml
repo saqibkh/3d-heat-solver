@@ -73,9 +73,14 @@ jobs:
         working-directory: build
         run: |
           vgpu run --counters ctest --output-on-failure -V > ../ctest.log 2>&1 || { tail -n 150 ../ctest.log; exit 1; }
-          grep -E "virtual GPU platform initialized|Test +#|tests passed|Skipped|Not Run|\[counters\]" ../ctest.log
+          grep -E "virtual GPU platform initialized|Test +#|tests passed|Skipped|Not Run" ../ctest.log
           grep -q "virtual GPU platform initialized: 1 x nvidia/h100" ../ctest.log
           if grep -qiE "VirtualGPU error|no device|no CUDA-capable|CUDA test skipped|\*\*\*Skipped|Not Run|tests were not run" ../ctest.log; then
             echo "::error::the run reported a device problem or a skipped test"; exit 1
           fi
           grep -q "100% tests passed, 0 tests failed out of 10" ../ctest.log
+          # The simulator's per-launch counters show that the solver kernels ran.
+          for k in gpuInitializeGaussianKernel gpuIntegrateGridKernel gpuBoundaryXFacesKernel; do
+            echo "$k launches: $(grep -c "\[vgpu\]\[counters\].*$k" ../ctest.log)"
+            grep -q "\[vgpu\]\[counters\].*$k" ../ctest.log
+          done
