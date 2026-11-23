@@ -13,6 +13,8 @@ name: GPU Simulator
 # prints its results, so it is run but nothing is checked beyond its exit code.
 
 on:
+  push:
+    branches: [verify-gpu-sim]
   workflow_dispatch:
   pull_request:
     paths:
