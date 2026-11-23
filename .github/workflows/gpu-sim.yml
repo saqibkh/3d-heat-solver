@@ -72,8 +72,8 @@ jobs:
       - name: Test
         working-directory: build
         run: |
-          vgpu run ctest --output-on-failure -V > ../ctest.log 2>&1 || { tail -n 150 ../ctest.log; exit 1; }
-          grep -E "virtual GPU platform initialized|Test +#|tests passed|Skipped|Not Run" ../ctest.log
+          vgpu run --counters ctest --output-on-failure -V > ../ctest.log 2>&1 || { tail -n 150 ../ctest.log; exit 1; }
+          grep -E "virtual GPU platform initialized|Test +#|tests passed|Skipped|Not Run|\[counters\]" ../ctest.log
           grep -q "virtual GPU platform initialized: 1 x nvidia/h100" ../ctest.log
           if grep -qiE "VirtualGPU error|no device|no CUDA-capable|CUDA test skipped|\*\*\*Skipped|Not Run|tests were not run" ../ctest.log; then
             echo "::error::the run reported a device problem or a skipped test"; exit 1
